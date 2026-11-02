@@ -8,14 +8,12 @@ using OpenPronounceSharp.Manager;
 using OpenPronounceSharp.Model;
 using OpenPronounceSharp.WinApp.Adapter;
 using SharpUtility.Helper;
-using System.Text;
 using System.Web;
 
 namespace OpenPronounceSharp.WinApp
 {
     public partial class frmMain : Form
     {
-        private const string recordingApi = "WasapiRecorderCapture";
         private const int rate = audio.TARGET_SR;
         private const int channels = 1;
         private IWaveIn captureDevice;
@@ -138,7 +136,7 @@ namespace OpenPronounceSharp.WinApp
             {
                 this.tempAudioFileName = $"{Path.GetRandomFileName()}.wav";
 
-                writer = new WaveFileWriter(this.GetTempAudioFilePath(), captureDevice.WaveFormat);
+                this.writer = new WaveFileWriter(this.GetTempAudioFilePath(), captureDevice.WaveFormat);
 
                 this.captureDevice.StartRecording();
 
@@ -170,7 +168,7 @@ namespace OpenPronounceSharp.WinApp
 
         private void Cleanup()
         {
-            if (captureDevice != null)
+            if (this.captureDevice != null)
             {
                 this.captureDevice.DataAvailable -= this.OnDataAvailable;
                 this.captureDevice.RecordingStopped -= this.OnRecordingStopped;
@@ -216,14 +214,14 @@ namespace OpenPronounceSharp.WinApp
 
         private void OnRecordingStopped(object sender, StoppedEventArgs e)
         {
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
                 this.BeginInvoke(new EventHandler<StoppedEventArgs>(OnRecordingStopped), sender, e);
                 return;
             }
 
             this.FinalizeWaveFile();
-            progressBar1.Value = 0;
+            this.progressBar1.Value = 0;
 
             if (e.Exception != null)
             {
@@ -443,33 +441,21 @@ namespace OpenPronounceSharp.WinApp
         private async Task ShowResult(string result)
         {
             await this.webView.ExecuteScriptAsync($"renderResult('{HttpUtility.UrlEncode(result)}','{HttpUtility.UrlEncode(this.txtText.Text.Trim())}')");
-        }
-
-        private string GetScriptNode(string path)
-        {
-            return $"<script>{this.GetFileContent(path)}</script>";
-        }
-
-        private string GetStyleNode(string path)
-        {
-            return $"<style>{this.GetFileContent(path)}</style>";
-        }
-
-        private string GetFileContent(string filePath)
-        {
-            return File.ReadAllText(filePath);
-        }
+        }         
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
             {
-                var files = new DirectoryInfo(LocationHelper.TEMP_DIR).GetFiles();
-
-                foreach (var file in files)
+                if(Directory.Exists(this.outputFolder))
                 {
-                    file.Delete();
-                }                
+                    var files = new DirectoryInfo(this.outputFolder).GetFiles();
+
+                    foreach (var file in files)
+                    {
+                        file.Delete();
+                    }
+                }                            
             }
             catch (Exception ex)
             {
