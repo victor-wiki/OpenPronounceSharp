@@ -302,10 +302,16 @@ namespace OpenPronounceSharp.WinApp
 
         private void WavePlayer_PlaybackStopped(object? sender, StoppedEventArgs e)
         {
+            this.DisposePlayer();
+        }
+
+        private void DisposePlayer()
+        {
             try
             {
                 if (this.wavePlayer != null)
                 {
+                    this.wavePlayer.Stop();
                     this.wavePlayer.Dispose();
                     this.wavePlayer = null;
                 }
@@ -471,6 +477,8 @@ namespace OpenPronounceSharp.WinApp
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            this.DisposePlayer();
+
             if (Directory.Exists(this.outputFolder))
             {
                 var files = new DirectoryInfo(this.outputFolder).GetFiles();
