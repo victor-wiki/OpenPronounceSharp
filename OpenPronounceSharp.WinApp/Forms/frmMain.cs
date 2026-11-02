@@ -26,10 +26,11 @@ namespace OpenPronounceSharp.WinApp
         private bool devicesChangedWhileRecording;
         private readonly MMDeviceEnumerator deviceEnumerator = new();
         private IWavePlayer wavePlayer;
+        private AudioFileReader audioFileReader;
 
         public frmMain()
         {
-            InitializeComponent();            
+            InitializeComponent();
 
             this.Init();
         }
@@ -58,7 +59,7 @@ namespace OpenPronounceSharp.WinApp
             this.webView.CoreWebView2.SetVirtualHostNameToFolderMapping("js.local", jsFolder, CoreWebView2HostResourceAccessKind.Allow);
             this.webView.CoreWebView2.SetVirtualHostNameToFolderMapping("css.local", cssFolder, CoreWebView2HostResourceAccessKind.Allow);
 
-            string html = File.ReadAllText("Template/Result.html");    
+            string html = File.ReadAllText("Template/Result.html");
 
             this.webView.NavigateToString(html);
         }
@@ -153,12 +154,12 @@ namespace OpenPronounceSharp.WinApp
 
         private string GetTempAudioFilePath()
         {
-            if(tempAudioFileName == null)
+            if (this.tempAudioFileName == null)
             {
                 return null;
             }
 
-            return Path.Combine(outputFolder, tempAudioFileName);
+            return Path.Combine(this.outputFolder, this.tempAudioFileName);
         }
 
         private void btnStopRecord_Click(object sender, EventArgs e)
@@ -263,11 +264,11 @@ namespace OpenPronounceSharp.WinApp
             }
         }
 
-        private void btnPlay_Click(object sender, EventArgs e)
+        private void btnPlayRecording_Click(object sender, EventArgs e)
         {
             string filePath = this.GetTempAudioFilePath();
 
-            if(filePath == null)
+            if (filePath == null)
             {
                 return;
             }
@@ -287,13 +288,37 @@ namespace OpenPronounceSharp.WinApp
             if (this.wavePlayer == null)
             {
                 this.wavePlayer = new WaveOut();
+
+                this.wavePlayer.PlaybackStopped += this.WavePlayer_PlaybackStopped;
             }
 
-            var file = new AudioFileReader(filePath);
-            var fadeInOut = new FadeInOutSampleProvider(file);
+            this.audioFileReader = new AudioFileReader(filePath);          
+
+            var fadeInOut = new FadeInOutSampleProvider(this.audioFileReader);
 
             this.wavePlayer.Init(fadeInOut);
             this.wavePlayer.Play();
+        }
+
+        private void WavePlayer_PlaybackStopped(object? sender, StoppedEventArgs e)
+        {
+            try
+            {
+                if (this.wavePlayer != null)
+                {
+                    this.wavePlayer.Dispose();
+                    this.wavePlayer = null;
+                }
+
+                if (this.audioFileReader != null)
+                {
+                    this.audioFileReader.Dispose();
+                    this.audioFileReader = null;
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         private void tsmiSetting_Click(object sender, EventArgs e)
@@ -345,11 +370,12 @@ namespace OpenPronounceSharp.WinApp
 
             button.BeginInvoke(() => { button.Enabled = false; });
 
-            this.progressBar2.BeginInvoke(() =>            {
-               
+            this.progressBar2.BeginInvoke(() =>
+            {
+
                 this.progressBar2.Style = ProgressBarStyle.Marquee;
                 this.progressBar2.Visible = true;
-            });            
+            });
 
             try
             {
@@ -414,11 +440,11 @@ namespace OpenPronounceSharp.WinApp
 
                 string jsonResult = JsonConvert.SerializeObject(result);
 
-                if(setting.ShowConsoleWindow)
+                if (setting.ShowConsoleWindow)
                 {
                     Console.WriteLine("The result is:");
                     Console.WriteLine(jsonResult);
-                }               
+                }
 
                 await this.ShowResult(jsonResult);
             }
@@ -430,36 +456,35 @@ namespace OpenPronounceSharp.WinApp
             {
                 button.BeginInvoke(() => { button.Enabled = true; });
 
-                this.progressBar2.BeginInvoke(() => 
+                this.progressBar2.BeginInvoke(() =>
                 {
                     this.progressBar2.Visible = false;
                     this.progressBar2.Style = ProgressBarStyle.Blocks;
                 });
-            }           
+            }
         }
 
         private async Task ShowResult(string result)
         {
             await this.webView.ExecuteScriptAsync($"renderResult('{HttpUtility.UrlEncode(result)}','{HttpUtility.UrlEncode(this.txtText.Text.Trim())}')");
-        }         
+        }
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            try
+            if (Directory.Exists(this.outputFolder))
             {
-                if(Directory.Exists(this.outputFolder))
-                {
-                    var files = new DirectoryInfo(this.outputFolder).GetFiles();
+                var files = new DirectoryInfo(this.outputFolder).GetFiles();
 
-                    foreach (var file in files)
+                foreach (var file in files)
+                {
+                    try
                     {
                         file.Delete();
                     }
-                }                            
-            }
-            catch (Exception ex)
-            {
-
+                    catch (Exception ex)
+                    {
+                    }
+                }
             }
         }
 
@@ -467,25 +492,25 @@ namespace OpenPronounceSharp.WinApp
         {
             var filePath = this.txtFilePath.Text.Trim();
 
-            if(filePath.Length == 0)
+            if (filePath.Length == 0)
             {
                 return;
             }
 
-            if(!File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
                 MessageBox.Show("File not found!");
                 return;
             }
 
-            this.Analyze(filePath, true);        
+            this.Analyze(filePath, true);
         }
 
         private void btnAnalyzeRecording_Click(object sender, EventArgs e)
         {
             string filePath = this.GetTempAudioFilePath();
 
-            if(filePath == null)
+            if (filePath == null)
             {
                 return;
             }
@@ -511,6 +536,16 @@ namespace OpenPronounceSharp.WinApp
             string filePath = await audio.text2speech(text);
 
             this.PlayFile(filePath);
+        }
+
+        private void btnPlaySelectedFile_Click(object sender, EventArgs e)
+        {
+            string filePath = this.txtFilePath.Text.Trim();
+
+            if (File.Exists(filePath))
+            {
+                this.PlayFile(filePath);
+            }
         }
     }
 }

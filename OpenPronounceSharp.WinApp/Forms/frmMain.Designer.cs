@@ -46,6 +46,7 @@
             webView = new Microsoft.Web.WebView2.WinForms.WebView2();
             btnPlayText = new Button();
             progressBar2 = new ProgressBar();
+            btnPlaySelectedFile = new Button();
             menuStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -71,7 +72,7 @@
             // btnOpenFile
             // 
             btnOpenFile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnOpenFile.Location = new Point(695, 16);
+            btnOpenFile.Location = new Point(633, 16);
             btnOpenFile.Name = "btnOpenFile";
             btnOpenFile.Size = new Size(65, 23);
             btnOpenFile.TabIndex = 7;
@@ -84,7 +85,7 @@
             txtFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtFilePath.Location = new Point(51, 16);
             txtFilePath.Name = "txtFilePath";
-            txtFilePath.Size = new Size(638, 23);
+            txtFilePath.Size = new Size(576, 23);
             txtFilePath.TabIndex = 6;
             // 
             // openFileDialog1
@@ -106,7 +107,7 @@
             txtText.Location = new Point(63, 35);
             txtText.Multiline = true;
             txtText.Name = "txtText";
-            txtText.Size = new Size(743, 47);
+            txtText.Size = new Size(728, 47);
             txtText.TabIndex = 9;
             // 
             // btnStopRecord
@@ -114,7 +115,7 @@
             btnStopRecord.Location = new Point(124, 23);
             btnStopRecord.Margin = new Padding(3, 4, 3, 4);
             btnStopRecord.Name = "btnStopRecord";
-            btnStopRecord.Size = new Size(68, 30);
+            btnStopRecord.Size = new Size(68, 24);
             btnStopRecord.TabIndex = 10;
             btnStopRecord.Text = "Stop";
             btnStopRecord.UseVisualStyleBackColor = true;
@@ -125,7 +126,7 @@
             btnStartRecord.Location = new Point(50, 23);
             btnStartRecord.Margin = new Padding(3, 4, 3, 4);
             btnStartRecord.Name = "btnStartRecord";
-            btnStartRecord.Size = new Size(68, 30);
+            btnStartRecord.Size = new Size(68, 24);
             btnStartRecord.TabIndex = 11;
             btnStartRecord.Text = "Start";
             btnStartRecord.UseVisualStyleBackColor = true;
@@ -134,23 +135,23 @@
             // btnPlay
             // 
             btnPlay.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnPlay.Location = new Point(775, 23);
+            btnPlay.Location = new Point(800, 23);
             btnPlay.Margin = new Padding(3, 4, 3, 4);
             btnPlay.Name = "btnPlay";
-            btnPlay.Size = new Size(75, 30);
+            btnPlay.Size = new Size(50, 24);
             btnPlay.TabIndex = 12;
             btnPlay.Text = "Play";
             btnPlay.UseVisualStyleBackColor = true;
-            btnPlay.Click += btnPlay_Click;
+            btnPlay.Click += btnPlayRecording_Click;
             // 
             // progressBar1
             // 
             progressBar1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            progressBar1.Location = new Point(537, 26);
+            progressBar1.Location = new Point(552, 23);
             progressBar1.Margin = new Padding(3, 4, 3, 4);
             progressBar1.Maximum = 30;
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(223, 27);
+            progressBar1.Size = new Size(223, 24);
             progressBar1.TabIndex = 13;
             // 
             // groupBox1
@@ -163,7 +164,7 @@
             groupBox1.Controls.Add(btnPlay);
             groupBox1.Location = new Point(12, 143);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(856, 64);
+            groupBox1.Size = new Size(856, 60);
             groupBox1.TabIndex = 19;
             groupBox1.TabStop = false;
             groupBox1.Text = "Recording";
@@ -172,7 +173,7 @@
             // 
             btnAnalyzeRecording.Location = new Point(200, 23);
             btnAnalyzeRecording.Name = "btnAnalyzeRecording";
-            btnAnalyzeRecording.Size = new Size(68, 30);
+            btnAnalyzeRecording.Size = new Size(68, 24);
             btnAnalyzeRecording.TabIndex = 14;
             btnAnalyzeRecording.Text = "Analyze";
             btnAnalyzeRecording.UseVisualStyleBackColor = true;
@@ -181,6 +182,7 @@
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(btnPlaySelectedFile);
             groupBox2.Controls.Add(btnAnalyzeFile);
             groupBox2.Controls.Add(txtFilePath);
             groupBox2.Controls.Add(btnOpenFile);
@@ -194,7 +196,7 @@
             // btnAnalyzeFile
             // 
             btnAnalyzeFile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAnalyzeFile.Location = new Point(775, 16);
+            btnAnalyzeFile.Location = new Point(704, 16);
             btnAnalyzeFile.Name = "btnAnalyzeFile";
             btnAnalyzeFile.Size = new Size(75, 23);
             btnAnalyzeFile.TabIndex = 8;
@@ -217,10 +219,10 @@
             // btnPlayText
             // 
             btnPlayText.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnPlayText.Location = new Point(812, 52);
+            btnPlayText.Location = new Point(812, 58);
             btnPlayText.Margin = new Padding(3, 4, 3, 4);
             btnPlayText.Name = "btnPlayText";
-            btnPlayText.Size = new Size(50, 30);
+            btnPlayText.Size = new Size(50, 24);
             btnPlayText.TabIndex = 22;
             btnPlayText.Text = "Play";
             btnPlayText.UseVisualStyleBackColor = true;
@@ -237,6 +239,18 @@
             progressBar2.Style = ProgressBarStyle.Marquee;
             progressBar2.TabIndex = 23;
             progressBar2.Visible = false;
+            // 
+            // btnPlaySelectedFile
+            // 
+            btnPlaySelectedFile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnPlaySelectedFile.Location = new Point(800, 17);
+            btnPlaySelectedFile.Margin = new Padding(3, 4, 3, 4);
+            btnPlaySelectedFile.Name = "btnPlaySelectedFile";
+            btnPlaySelectedFile.Size = new Size(50, 24);
+            btnPlaySelectedFile.TabIndex = 23;
+            btnPlaySelectedFile.Text = "Play";
+            btnPlaySelectedFile.UseVisualStyleBackColor = true;
+            btnPlaySelectedFile.Click += btnPlaySelectedFile_Click;
             // 
             // frmMain
             // 
@@ -287,5 +301,6 @@
         private Button btnAnalyzeFile;
         private Button btnAnalyzeRecording;
         private ProgressBar progressBar2;
+        private Button btnPlaySelectedFile;
     }
 }
