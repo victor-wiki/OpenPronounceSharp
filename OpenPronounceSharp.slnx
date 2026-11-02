@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="OpenPronounceSharp.ConsoleApp/OpenPronounceSharp.ConsoleApp.csproj" />
+  <Project Path="OpenPronounceSharp.Web/OpenPronounceSharp.Web.csproj" />
+  <Project Path="OpenPronounceSharp.WinApp/OpenPronounceSharp.WinApp.csproj" />
+  <Project Path="OpenPronounceSharp/OpenPronounceSharp.csproj" />
+</Solution>

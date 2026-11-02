@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenPronounceSharp: say a sentence, see which sounds went wrong</title>
+    <script type="importmap"></script> 
+    <link rel="stylesheet" href="~/css/main.css?v=1" />
+    <style>
+            body { font-feature-settings: "cv11", "ss01"; }
+
+            /* Recording pulse: the only always-on motion, and only while recording */
+            @@keyframes rec-pulse {
+                0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.45); }
+                70% { box-shadow: 0 0 0 22px rgba(234, 88, 12, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
+            }
+            .is-recording { animation: rec-pulse 1.4s ease-out infinite; }
+
+            /* Indeterminate progress line shown while the server works */
+            @@keyframes progress-slide {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(400%); }
+            }
+            .progress-line::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                width: 25%;
+                background: #ea580c;
+                border-radius: 9999px;
+                animation: progress-slide 1.6s ease-in-out infinite;
+            }
+
+            /* Result reveal */
+            .reveal { animation: reveal 0.5s ease-out both; }
+            @@keyframes reveal {
+                from { opacity: 0; transform: translateY(8px); }
+                to { opacity: 1; transform: none; }
+            }
+            #score-ring { transition: stroke-dashoffset 1s cubic-bezier(.2, .7, .2, 1); }
+
+            /* Word chips */
+            .chip { transition: transform .12s ease, box-shadow .12s ease; }
+            .chip:hover { transform: translateY(-1px); }
+            .chip[aria-pressed="true"] { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #ea580c; }
+
+            details > summary { list-style: none; }
+            details > summary::-webkit-details-marker { display: none; }
+            details[open] .chev { transform: rotate(180deg); }
+            .chev { transition: transform .2s ease; }
+
+            @@media (prefers-reduced-motion: reduce) {
+                .is-recording, .progress-line::after, .reveal { animation: none; }
+                #score-ring { transition: none; }
+            }
+    </style>
+</head>
+<body class="bg-[#fcfcfb] text-neutral-800 min-h-screen antialiased">
+
+    @RenderBody()
+
+    <footer class="max-w-2xl mx-auto px-5 pb-10 text-xs text-neutral-500 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <a href="https://blog.lepine.pro/en/ai-wav2vec-pronunciation-vectorization/" target="_blank" rel="noopener"
+           class="hover:text-neutral-800">How it works</a>
+    </footer>  
+    <script src="~/js/audio.js?v=1"></script>
+    <script src="~/js/viseme.js?v=1"></script>
+    <script src="~/js/ui.js?v=1"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
